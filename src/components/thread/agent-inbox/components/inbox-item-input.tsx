@@ -397,7 +397,7 @@ export function InboxItemInput({
             }
           : {
               ...response.edited_action.args,
-              [key as string]: change as string;
+              [key as string]: change as string,
             };
 
       const newEdit: DecisionWithEdits = {

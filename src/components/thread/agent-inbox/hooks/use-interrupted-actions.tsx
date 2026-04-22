@@ -151,11 +151,12 @@ export default function useInterruptedActions({
       });
 
       setStreamFinished(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error sending human response", error);
       errorOccurred = true;
 
-      if ("message" in error && error.message.includes("Invalid assistant")) {
+      const message = (error as { message?: string })?.message ?? "";
+      if (message.includes("Invalid assistant")) {
         toast("Error: Invalid assistant ID", {
           description:
             "The provided assistant ID was not found in this graph. Please update the assistant ID in the settings and try again.",

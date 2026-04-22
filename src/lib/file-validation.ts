@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import type { Base64ContentBlock } from "@langchain/core/messages";
+import { ContentBlock } from "@langchain/core/messages";
 import { fileToContentBlock } from "@/lib/multimodal-utils";
 
 /**
@@ -30,13 +30,13 @@ const ERROR_MESSAGES = {
  */
 export function isDuplicate(
   file: File,
-  existingBlocks: Base64ContentBlock[],
+  existingBlocks: ContentBlock.Multimodal.Data[],
 ): boolean {
   if (file.type === "application/pdf") {
     return existingBlocks.some(
       (block) =>
         block.type === "file" &&
-        block.mime_type === "application/pdf" &&
+        block.mimeType === "application/pdf" &&
         block.metadata?.filename === file.name,
     );
   }
@@ -46,7 +46,7 @@ export function isDuplicate(
       (block) =>
         block.type === "image" &&
         block.metadata?.name === file.name &&
-        block.mime_type === file.type,
+        block.mimeType === file.type,
     );
   }
 
@@ -68,7 +68,7 @@ export interface FileValidationResult {
  */
 export function validateFiles(
   files: File[],
-  existingBlocks: Base64ContentBlock[],
+  existingBlocks: ContentBlock.Multimodal.Data[],
 ): FileValidationResult {
   const validFiles = files.filter((file) =>
     SUPPORTED_FILE_TYPES.includes(file.type as (typeof SUPPORTED_FILE_TYPES)[number]),
@@ -120,9 +120,9 @@ export function showFileValidationErrors(
  */
 export async function processFiles(
   files: File[],
-  existingBlocks: Base64ContentBlock[],
+  existingBlocks: ContentBlock.Multimodal.Data[],
   isPaste = false,
-): Promise<Base64ContentBlock[]> {
+): Promise<ContentBlock.Multimodal.Data[]> {
   const validation = validateFiles(files, existingBlocks);
   showFileValidationErrors(validation, isPaste);
 
@@ -130,8 +130,8 @@ export async function processFiles(
     return [];
   }
 
-  const newBlocks = await Promise.all(
+  const newBlocks = (await Promise.all(
     validation.uniqueFiles.map(fileToContentBlock),
-  );
+  )) as ContentBlock.Multimodal.Data[];
   return newBlocks;
 }

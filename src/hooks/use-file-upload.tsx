@@ -20,7 +20,7 @@ export function useFileUpload({
     if (!files) return;
 
     const fileArray = Array.from(files);
-    const newBlocks = (await processFiles(fileArray, contentBlocks as any, false)) as ContentBlock.Multimodal.Data[];
+    const newBlocks = await processFiles(fileArray, contentBlocks, false);
 
     if (newBlocks.length > 0) {
       setContentBlocks((prev) => [...prev, ...newBlocks]);
@@ -58,7 +58,7 @@ export function useFileUpload({
       if (!e.dataTransfer) return;
 
       const files = Array.from(e.dataTransfer.files);
-      const newBlocks = (await processFiles(files, contentBlocks as any, false)) as ContentBlock.Multimodal.Data[];
+      const newBlocks = await processFiles(files, contentBlocks, false);
 
       if (newBlocks.length > 0) {
         setContentBlocks((prev) => [...prev, ...newBlocks]);
@@ -145,7 +145,7 @@ export function useFileUpload({
 
     e.preventDefault();
 
-    const newBlocks = (await processFiles(files, contentBlocks as any, true)) as ContentBlock.Multimodal.Data[];
+    const newBlocks = await processFiles(files, contentBlocks, true);
 
     if (newBlocks.length > 0) {
       setContentBlocks((prev) => [...prev, ...newBlocks]);

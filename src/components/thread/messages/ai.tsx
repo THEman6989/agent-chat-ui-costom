@@ -92,9 +92,9 @@ function Interrupt({
   hasNoAIOrToolMessages,
 }: InterruptProps) {
   const fallbackValue = Array.isArray(interrupt)
-    ? (interrupt as Record<string, any>[])
+    ? (interrupt as Record<string, unknown>[])
     : (((interrupt as { value?: unknown } | undefined)?.value ??
-        interrupt) as Record<string, any>);
+        interrupt) as Record<string, unknown>);
 
   return (
     <>
