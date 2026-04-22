@@ -1,16 +1,16 @@
 import { useState, useRef, useEffect, ChangeEvent } from "react";
-import type { Base64ContentBlock } from "@langchain/core/messages";
+import { ContentBlock } from "@langchain/core/messages";
 import { processFiles } from "@/lib/file-validation";
 
 interface UseFileUploadOptions {
-  initialBlocks?: Base64ContentBlock[];
+  initialBlocks?: ContentBlock.Multimodal.Data[];
 }
 
 export function useFileUpload({
   initialBlocks = [],
 }: UseFileUploadOptions = {}) {
   const [contentBlocks, setContentBlocks] =
-    useState<Base64ContentBlock[]>(initialBlocks);
+    useState<ContentBlock.Multimodal.Data[]>(initialBlocks);
   const dropRef = useRef<HTMLDivElement>(null);
   const [dragOver, setDragOver] = useState(false);
   const dragCounter = useRef(0);
@@ -20,7 +20,7 @@ export function useFileUpload({
     if (!files) return;
 
     const fileArray = Array.from(files);
-    const newBlocks = await processFiles(fileArray, contentBlocks, false);
+    const newBlocks = (await processFiles(fileArray, contentBlocks as any, false)) as ContentBlock.Multimodal.Data[];
 
     if (newBlocks.length > 0) {
       setContentBlocks((prev) => [...prev, ...newBlocks]);
@@ -58,7 +58,7 @@ export function useFileUpload({
       if (!e.dataTransfer) return;
 
       const files = Array.from(e.dataTransfer.files);
-      const newBlocks = await processFiles(files, contentBlocks, false);
+      const newBlocks = (await processFiles(files, contentBlocks as any, false)) as ContentBlock.Multimodal.Data[];
 
       if (newBlocks.length > 0) {
         setContentBlocks((prev) => [...prev, ...newBlocks]);
@@ -145,7 +145,7 @@ export function useFileUpload({
 
     e.preventDefault();
 
-    const newBlocks = await processFiles(files, contentBlocks, true);
+    const newBlocks = (await processFiles(files, contentBlocks as any, true)) as ContentBlock.Multimodal.Data[];
 
     if (newBlocks.length > 0) {
       setContentBlocks((prev) => [...prev, ...newBlocks]);

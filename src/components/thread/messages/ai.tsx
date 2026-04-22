@@ -81,26 +81,31 @@ function parseAnthropicStreamedToolCalls(
 }
 
 interface InterruptProps {
-  interruptValue?: unknown;
+  interrupt?: unknown;
   isLastMessage: boolean;
   hasNoAIOrToolMessages: boolean;
 }
 
 function Interrupt({
-  interruptValue,
+  interrupt,
   isLastMessage,
   hasNoAIOrToolMessages,
 }: InterruptProps) {
+  const fallbackValue = Array.isArray(interrupt)
+    ? (interrupt as Record<string, any>[])
+    : (((interrupt as { value?: unknown } | undefined)?.value ??
+        interrupt) as Record<string, any>);
+
   return (
     <>
-      {isAgentInboxInterruptSchema(interruptValue) &&
+      {isAgentInboxInterruptSchema(interrupt) &&
         (isLastMessage || hasNoAIOrToolMessages) && (
-          <ThreadView interrupt={interruptValue} />
+          <ThreadView interrupt={interrupt} />
         )}
-      {interruptValue &&
-      !isAgentInboxInterruptSchema(interruptValue) &&
+      {interrupt &&
+      !isAgentInboxInterruptSchema(interrupt) &&
       (isLastMessage || hasNoAIOrToolMessages) ? (
-        <GenericInterruptView interrupt={interruptValue as Record<string, unknown> | Record<string, unknown>[]} />
+        <GenericInterruptView interrupt={fallbackValue} />
       ) : null}
     </>
   );
@@ -154,13 +159,13 @@ export function AssistantMessage({
   }
 
   return (
-    <div className="group mr-auto flex items-start gap-3">
-      <div className="flex flex-col gap-3">
+    <div className="group mr-auto flex w-full items-start gap-3">
+      <div className="flex w-full flex-col gap-3">
         {isToolResult ? (
           <>
             <ToolResult message={message} isLoading={isLoading} />
             <Interrupt
-              interruptValue={threadInterrupt?.value}
+              interrupt={threadInterrupt}
               isLastMessage={isLastMessage}
               hasNoAIOrToolMessages={hasNoAIOrToolMessages}
             />
@@ -194,7 +199,7 @@ export function AssistantMessage({
               />
             )}
             <Interrupt
-              interruptValue={threadInterrupt?.value}
+              interrupt={threadInterrupt}
               isLastMessage={isLastMessage}
               hasNoAIOrToolMessages={hasNoAIOrToolMessages}
             />
@@ -226,7 +231,7 @@ export function AssistantMessage({
 
 export function AssistantMessageLoading() {
   return (
-    <div className="mr-auto flex items-start gap-3">
+    <div className="mr-auto flex w-full items-start gap-3">
       <div className="bg-muted flex h-9 items-center gap-1.5 rounded-2xl px-5 py-2.5 shadow-sm border border-border/20">
         <div className="bg-foreground/40 h-1.5 w-1.5 animate-[pulse_1.5s_ease-in-out_infinite] rounded-full"></div>
         <div className="bg-foreground/40 h-1.5 w-1.5 animate-[pulse_1.5s_ease-in-out_0.5s_infinite] rounded-full"></div>

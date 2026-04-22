@@ -34,18 +34,32 @@ function getThreadSearchMetadata(
 }
 
 export function ThreadProvider({ children }: { children: ReactNode }) {
-  const [apiUrl] = useQueryState("apiUrl");
+  const envApiUrl: string | undefined = process.env.NEXT_PUBLIC_API_URL;
+  const envAssistantId: string | undefined =
+    process.env.NEXT_PUBLIC_ASSISTANT_ID;
+  const envAuthScheme: string | undefined = process.env.NEXT_PUBLIC_AUTH_SCHEME;
+
+  const [apiUrl] = useQueryState("apiUrl", {
+    defaultValue: envApiUrl || "",
+  });
   const [assistantId] = useQueryState("assistantId");
+  const [authScheme] = useQueryState("authScheme", {
+    defaultValue: envAuthScheme || "",
+  });
   const [threads, setThreads] = useState<Thread[]>([]);
   const [threadsLoading, setThreadsLoading] = useState(false);
-  const envApiUrl: string | undefined = process.env.NEXT_PUBLIC_API_URL;
+
   const finalApiUrl = apiUrl || envApiUrl;
   const sanitizedAssistantId = assistantId?.trim();
-  const finalAssistantId = sanitizedAssistantId || undefined;
+  const finalAssistantId = sanitizedAssistantId || envAssistantId;
 
   const getThreads = useCallback(async (): Promise<Thread[]> => {
     if (!finalApiUrl || !finalAssistantId) return [];
-    const client = createClient(finalApiUrl, getApiKey() ?? undefined);
+    const client = createClient(
+      finalApiUrl,
+      getApiKey() ?? undefined,
+      authScheme || undefined
+    );
 
     const threads = await client.threads.search({
       metadata: {
@@ -55,7 +69,7 @@ export function ThreadProvider({ children }: { children: ReactNode }) {
     });
 
     return threads;
-  }, [finalApiUrl, finalAssistantId]);
+  }, [finalApiUrl, finalAssistantId, authScheme]);
 
   const value = useMemo(
     () => ({

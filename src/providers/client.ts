@@ -21,11 +21,20 @@ export function normalizeApiUrl(apiUrl: string | undefined | null): string {
   return trimmed;
 }
 
-export function createClient(apiUrl: string, apiKey: string | undefined) {
+export function createClient(
+  apiUrl: string,
+  apiKey: string | undefined,
+  authScheme?: string | undefined,
+) {
   const resolvedApiUrl = normalizeApiUrl(apiUrl);
 
   return new Client({
     apiKey,
     apiUrl: resolvedApiUrl,
+    ...(authScheme && {
+      defaultHeaders: {
+        "X-Auth-Scheme": authScheme,
+      },
+    }),
   });
 }
