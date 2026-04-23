@@ -1,7 +1,9 @@
 # Stufe 1: Abhängigkeiten installieren
 FROM node:20-alpine AS deps
+# libc6-compat wird oft für native Abhängigkeiten in Alpine benötigt
 RUN apk add --no-cache libc6-compat
-RUN npm install -g pnpm
+# Spezifische pnpm Version aus der package.json installieren
+RUN npm install -g pnpm@10.5.1
 WORKDIR /app
 
 # Kopiere Lockfiles für die Installation
@@ -10,13 +12,12 @@ RUN pnpm install --frozen-lockfile
 
 # Stufe 2: Den Build erstellen
 FROM node:20-alpine AS builder
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.5.1
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Next.js sammelt anonyme Telemetriedaten während des Builds. 
-# Deaktiviere dies hier, falls gewünscht:
+# Next.js sammelt anonyme Telemetriedaten während des Builds. Deaktivierung:
 ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN pnpm build
@@ -45,4 +46,5 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-CMD ["npm", "start"]
+# Nutzt das in der package.json definierte Start-Script
+CMD ["pnpm", "start"]
