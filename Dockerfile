@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Kopiere Lockfiles für die Installation
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # Stufe 2: Den Build erstellen
 FROM node:20-alpine AS builder
