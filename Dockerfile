@@ -47,4 +47,4 @@ ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
 # Nutzt das in der package.json definierte Start-Script
-CMD ["pnpm", "start"]
+CMD ["sh", "-c", "npx pnpm start"]
