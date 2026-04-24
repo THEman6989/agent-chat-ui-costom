@@ -34,7 +34,6 @@ function CustomComponent({
       {customComponents.map((customComponent) => (
         <LoadExternalComponent
           key={customComponent.id}
-          // @ts-expect-error Type mismatch with SDK's expected BaseStream type
           stream={thread}
           message={customComponent}
           meta={{ ui: customComponent, artifact }}
